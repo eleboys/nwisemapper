@@ -5,6 +5,7 @@ module NWise {
 		private converter: (src: any) => any = (src: any) => src;
 		private ignore: boolean;
 		private firstRowOfSource: boolean;
+		private toFirstRowOfArray: boolean;
 
 		public getSourceField(): string { return this.sourceField; }
 		public setSourceField(srcField: string) { this.sourceField = srcField; }
@@ -19,7 +20,10 @@ module NWise {
 		public setIgnore(ignore: boolean) { this.ignore = ignore; }
 
 		public getFirstRowOfSource(): boolean { return this.firstRowOfSource; }
-		public takeFirstRowOfSource() { this.firstRowOfSource = true; }		
+		public takeFirstRowOfSource() { this.firstRowOfSource = true; }
+
+		public getToFirstRowOfArray(): boolean { return this.toFirstRowOfArray; }
+		public putToFirstRowOfArray() { this.toFirstRowOfArray = true; }
 	}
 
 	class NWiseEntityMapperBuilder {
@@ -61,6 +65,8 @@ module NWise {
 		}
 
 		public map(source: any): any {
+			if (!source)
+				return source;
 			var target = {};
 			// retrieve ignore all configuration
 			var hasIgnoreAll = this.fieldMaps.findIndex(fm =>fm.getSourceField() === "*" && fm.getIgnore())>-1;
@@ -78,17 +84,22 @@ module NWise {
 				} else {
 					// get value of sourceField with convert strategy
 					var value = fieldMap.getConverter()(source[member]);
-					// if is configed to take just the first row of source 
+					// if is configed to take just the first row of source
 					if (fieldMap.getFirstRowOfSource()) {
 						// so the source converted value must be an array
 						if (Array.isArray(value)) {
 							target[fieldMap.getTargetField()] = value.length ? value[0] : undefined;
 						} else {
 							throw `taking first row of source works for array value (${member})`;
-						}		
-					// else put the value for the target	
+						}
 					} else {
-						target[fieldMap.getTargetField()] = value;
+						// if is configed to put source value as an first index of an array
+						if (fieldMap.getToFirstRowOfArray()) {
+							target[fieldMap.getTargetField()] = [value];
+						// else put the value for the target
+						} else {
+							target[fieldMap.getTargetField()] = value;
+						}
 					}
 				}
 			}
