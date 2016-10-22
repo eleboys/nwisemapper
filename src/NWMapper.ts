@@ -1,4 +1,8 @@
-module NWise {
+
+(function() {
+
+	let root = this;
+
 	class NWiseFieldMapper {
 		private sourceField: string;
 		private targetField: string;
@@ -44,10 +48,10 @@ module NWise {
 			return fieldMap;
 		}
 
-		public forMemberUseMap(srcM: string, tarM: string, map: [string, string]): NWiseFieldMapper {
+		public forMemberUseMap(srcM: string, tarM: string, map: [string, string], converter?: (src: any) => any): NWiseFieldMapper {
 			return this.forMember(srcM, tarM, (src) => {
 				return this.configuration.getConfiguarationBuilder()
-					.getNWiseMapper().map(map[0], map[1], src);
+					.getNWiseMapper().map(map[0], map[1], converter ? converter(src): src);
 			})
 		}
 
@@ -69,45 +73,59 @@ module NWise {
 				return source;
 			var target = {};
 			// retrieve ignore all configuration
-			var hasIgnoreAll = this.fieldMaps.findIndex(fm =>fm.getSourceField() === "*" && fm.getIgnore())>-1;
+			var hasIgnoreAll = this._filter(this.fieldMaps, fm =>fm.getSourceField() === "*" && fm.getIgnore()).length>0;
 			for (var member in source) {
-				var fieldMap = this.fieldMaps.find(fm => fm.getSourceField() === member);
+				var fieldMaps = this._filter(this.fieldMaps, fm => fm.getSourceField() === member);
 				// if no mapping strategy is defined for the field
-				if (typeof (fieldMap) === "undefined") {
+				if (fieldMaps.length==0) {
 					// if must not ignore all field that dont have mapping
 					if (!hasIgnoreAll) {
 						target[member] = source[member];
 					}
-				// if field is requested to be ingnored do nothing
-				} else if (fieldMap.getIgnore()) {
+				}
+				fieldMaps.forEach(function (fieldMap) {
+					// if field is requested to be ingnored do nothing
+					if (fieldMap.getIgnore()) {
 
-				} else {
-					// get value of sourceField with convert strategy
-					var value = fieldMap.getConverter()(source[member]);
-					// if is configed to take just the first row of source
-					if (fieldMap.getFirstRowOfSource()) {
-						// so the source converted value must be an array
-						if (Array.isArray(value)) {
-							target[fieldMap.getTargetField()] = value.length ? value[0] : undefined;
-						} else {
-							throw `taking first row of source works for array value (${member})`;
-						}
 					} else {
-						// if is configed to put source value as an first index of an array
-						if (fieldMap.getToFirstRowOfArray()) {
-							target[fieldMap.getTargetField()] = [value];
-						// else put the value for the target
+						// get value of sourceField with convert strategy
+						var value = fieldMap.getConverter()(source[member]);
+						// if is configed to take just the first row of source
+						if (fieldMap.getFirstRowOfSource()) {
+							// so the source converted value must be an array
+							if (Array.isArray(value)) {
+								target[fieldMap.getTargetField()] = value.length ? value[0] : undefined;
+							} else {
+								throw `taking first row of source works for array value (${member})`;
+							}
 						} else {
-							target[fieldMap.getTargetField()] = value;
+							// if is configed to put source value as an first index of an array
+							if (fieldMap.getToFirstRowOfArray()) {
+								target[fieldMap.getTargetField()] = [value];
+								// else put the value for the target
+							} else {
+								target[fieldMap.getTargetField()] = value;
+							}
 						}
 					}
-				}
+				});
 			}
+
 			return target;
 		}
 
 		public mapArray(sources: any[]): any {
 			return sources.map(src => this.map(src));
+		}
+
+		private _filter(arraay : any[], filterCallback: (item:any)=>boolean){
+			let result = [];
+			for (var i = 0; i<arraay.length; i++){
+				if (filterCallback(arraay[i])){
+					result.push(arraay[i]);
+				}
+			}
+			return result;
 		}
 	}
 
@@ -165,7 +183,7 @@ module NWise {
 		public getNWiseMapper(): NWiseMapper { return this.nwMapper; }
 	}
 
-	export class NWiseMapper {
+	class NWiseMapper {
 		private configBuilder: NWiseConfigurationBuilder;
 
 		constructor() {
@@ -190,27 +208,11 @@ module NWise {
 				return entityMapper.map(source);
 		}
 	}
-}
-var NWMapper = new NWise.NWiseMapper();
 
+    if (typeof module !== 'undefined') {
+		exports = module.exports = new NWiseMapper();
+    } else {
+        root.nwmapper = new NWiseMapper();
+    }
 
-// NWMapper.initialize(function (cb) {
-//     cb.createMap('C', 'D', function (emb) {
-//         emb.forMember('field1', 'field1', function (field1) { return field1 + ' (Added)'; });
-//     });
-//     cb.createMap('A', 'B', function (emb) {
-//         emb.forMember('tells', 'tells', function (tells) { return tells.split(','); });
-//         emb.forMember('emails', 'emailsArray', function (emails) { return emails.split(','); });
-// 		emb.forMember('cityType', 'cityTypeStr', function (cityType) { return cityType.toString(); });
-//         emb.forMemberUseMap('contacts', 'contacties', ['C', 'D'])			.takeFirstRowOfSource();
-//     });
-// });
-// var targetB = NWMapper.map('A', 'B', {
-//     tells: '12313,123123,123123',
-//     emails: 'a@b.com',
-//     cityType: 12,
-// 	id: 8,
-// 	count: 3,
-//     contacts: []
-// });
-// console.log(targetB);
+}).call(this);

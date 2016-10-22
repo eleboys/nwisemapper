@@ -1,0 +1,27 @@
+{
+  "name": "nwisemapper",
+  "version": "1.0.0",
+  "description": "Javascript object mapper",
+  "main": "./dist/nwmapper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eleboys/nwisemapper.git"
+  },
+  "keywords": [
+    "Javascript",
+    "Object",
+    "Mapper"
+  ],
+  "author": "Nima Baghdadi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eleboys/nwisemapper/issues"
+  },
+  "homepage": "https://github.com/eleboys/nwisemapper#readme",
+  "devDependencies": {
+    "typescript": "^2.0.3"
+  }
+}
