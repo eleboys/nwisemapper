@@ -1,0 +1,15 @@
+{
+  "name": "nwmapper",
+  "homepage": "https://github.com/eleboys/nwisemapper",
+  "main": "dist/nwmapper.js",
+  "_release": "85f6ef4f1c",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "85f6ef4f1c93f84d2b114fc142f78df260b67eb7"
+  },
+  "_source": "https://github.com/eleboys/nwisemapper.git",
+  "_target": "*",
+  "_originalSource": "nwmapper",
+  "_direct": true
+}
