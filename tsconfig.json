@@ -8,6 +8,6 @@
         "suppressImplicitAnyIndexErrors": true
 	},
 	"files": [
-		"src/NWMapper.ts"
+		"src/nwmapper.ts"
 	]
 }
