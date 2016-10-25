@@ -9,7 +9,7 @@ NWiseMapper is a convention-based Javascript object<->object mapper which both w
 - Customize mapping 
 - Ignorable members
 - Fluid and readble convention defenition pattern 
-- Array manipulatiob mapping functions (taking first row of source or pushing to first row of an array for target)
+- Array manipulation functions (taking first row of source or pushing to first row of an array for target)
 
 
 ## Usage
@@ -38,8 +38,6 @@ var sourceA = {
 };
 
 var targetB = nwmapper.map('ObjectA', 'ObjectB', sourceA);
-
-console.log(targetB);
 
 /* mapped object will be:
 { 
