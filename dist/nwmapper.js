@@ -75,7 +75,7 @@
                     }
                     else {
                         // get value of sourceField with convert strategy
-                        var value = fieldMap.getConverter()(source[member]);
+                        var value = fieldMap.getConverter()(source[member], source);
                         // if is configed to take just the first row of source
                         if (fieldMap.getFirstRowOfSource()) {
                             // so the source converted value must be an array
