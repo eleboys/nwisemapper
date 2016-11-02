@@ -101,7 +101,7 @@
 						} else {
 							// if is configed to put source value as an first index of an array
 							if (fieldMap.getToFirstRowOfArray()) {
-								target[fieldMap.getTargetField()] = [value];
+								target[fieldMap.getTargetField()] = value ? [value] : [];
 								// else put the value for the target
 							} else {
 								target[fieldMap.getTargetField()] = value;
